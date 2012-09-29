@@ -58,7 +58,7 @@ window.addEventListener('load', function(){
     }
   } catch(e) {
 
-    status.innerHTML = e.message || e;
+    status.textContent = e.message || e;
     loading.style.display = 'none';
     throw e;
   }

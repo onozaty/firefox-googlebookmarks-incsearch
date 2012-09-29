@@ -27,10 +27,10 @@ LoaderBase.prototype = {
   },
   dispStart: function() {
     Glayer.showBox(this.loadingBox);
-    this.loadingMessage.innerHTML = 'Bookmarks Loading...';
+    this.loadingMessage.textContent = 'Bookmarks Loading...';
   },
   dispLoading: function(count) {
-    this.loadingMessage.innerHTML = 'Bookmarks Loading... ' + count + '/' + this.total;
+    this.loadingMessage.textContent = 'Bookmarks Loading... ' + count + '/' + this.total;
   },
   dispEnd: function(count) {
     this.loadingBox.style.display = 'none';

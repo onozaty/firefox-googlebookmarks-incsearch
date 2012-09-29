@@ -87,7 +87,7 @@ Glayer.copyProperties(Glayer, {
       textElement = this.getElement(textElement);
     }
 
-    textElement.innerHTML = message;
+    textElement.textContent = message;
     return boxElement;
   },
 
@@ -147,7 +147,7 @@ Glayer.copyProperties(Glayer, {
       okElement = this.getElement(okElement);
     }
 
-    textElement.innerHTML = message;
+    textElement.textContent = message;
 
     okElement.value = boxOptions.okLabel || this.defaultAlert.okLabel;
     okElement.onclick = boxOptions.callback || this.getDefaultAlertOkFunc();
@@ -220,7 +220,7 @@ Glayer.copyProperties(Glayer, {
       cancelElement = this.getElement(cancelElement);
     }
 
-    textElement.innerHTML = message;
+    textElement.textContent = message;
 
     okElement.value = boxOptions.okLabel || this.defaultConfirm.okLabel;
     okElement.onclick = this.getConfirmResultFunc(resultCallback, true);

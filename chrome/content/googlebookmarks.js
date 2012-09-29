@@ -81,8 +81,8 @@ GoogleBookmarksLoader.prototype.__load = function() {
 
         if (xml == null) {
           // error
-          var errMsg = 'error : Can not load data.'
-                       + '<br />Please check ' + request.channel.URI.prePath;
+          var errMsg = 'error : Can not load data. '
+                       + 'Please check ' + request.channel.URI.prePath;
           self.error(errMsg);
         }
 

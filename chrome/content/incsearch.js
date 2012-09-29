@@ -318,7 +318,7 @@ IncSearch.prototype = {
       }
     }
 
-    pageLinkElm.innerHTML = '';
+    pageLinkElm.textContent = '';
 
     if (prev_page) {
       this.createPageAnchor(pageLinkElm, this.pagePrevName, pageNo - 1);
@@ -366,7 +366,7 @@ IncSearch.prototype = {
       }
       displayInfo = ['(display :', start, '-', end, ')'].join('');
     }
-    this.status.innerHTML = [this.resultCount.toString(), ' hits ',
+    this.status.textContent = [this.resultCount.toString(), ' hits ',
                              displayInfo, ' / total : ', this.totalCount].join('');
   },
   searchAfter: function() {
@@ -374,7 +374,7 @@ IncSearch.prototype = {
     window.scrollTo(0, 0);
   },
   searchBefore: function() {
-    this.status.innerHTML = 'Search...';
+    this.status.textContent = 'Search...';
   },
   changePageAfter: function(pageNo) {
     this.createInfo();
@@ -431,6 +431,9 @@ IncSearch.prototype = {
     if (elementText.length > 0) {
       if (this.startElementText) elementText.unshift(this.startElementText);
       if (this.endElementText) elementText.push(this.endElementText);
+
+      // "elementText" is safed HTML text.
+      // (escaped in "_escapeHTML" method)
       this.viewArea.innerHTML = elementText.join('');
     }
 
@@ -455,7 +458,7 @@ IncSearch.prototype = {
   },
 
   clearViewArea: function() {
-    this.viewArea.innerHTML = '';
+    this.viewArea.textContent = '';
     this.results = null;
     this.resultCount = null;
     this.nowPage = 0;
