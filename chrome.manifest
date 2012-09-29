@@ -1,0 +1,6 @@
+content  googlebookmarks_incsearch  chrome/content/
+skin     googlebookmarks_incsearch  classic/1.0  chrome/skin/
+
+overlay  chrome://browser/content/browser.xul  chrome://googlebookmarks_incsearch/content/overlay.xul
+style    chrome://browser/content/browser.xul  chrome://googlebookmarks_incsearch/skin/toolbar-button.css
+style    chrome://global/content/customizeToolbar.xul  chrome://googlebookmarks_incsearch/skin/toolbar-button.css

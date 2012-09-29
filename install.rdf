@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+
+  <Description about="urn:mozilla:install-manifest">
+
+    <em:id>googlebookmarks_incsearch@enjoyxstudy.com</em:id>
+    <em:type>2</em:type>
+    <em:version>1.5.0</em:version>
+
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
+        <em:minVersion>15.0</em:minVersion>
+        <em:maxVersion>15.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+
+    <em:name>Google Bookmarks IncSearch</em:name>
+    <em:description>This extension is a incremental search UI for Google Bookmarks(http://www.google.com/bookmarks/), You can find bookmarks very quickly.</em:description>
+    <em:creator>onozaty</em:creator>
+    <em:homepageURL>http://www.enjoyxstudy.com/firefox/extension/googlebookmarks_incsearch/</em:homepageURL>
+    <em:iconURL>chrome://googlebookmarks_incsearch/skin/icon-large.png</em:iconURL>
+  </Description>
+
+</RDF>
