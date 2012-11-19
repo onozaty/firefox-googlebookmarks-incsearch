@@ -39,6 +39,9 @@ IncSearch.prototype = {
     this.checkLoopTimer = null;
     this.setOptions(arguments[2] || {});
 
+    this.elementBuilder =
+      Ebi.createBuilder(['table', 'tr', 'th', 'td', 'p', 'a', 'strong', 'br']);
+
     this.reset();
 
     // check loop start
@@ -66,14 +69,9 @@ IncSearch.prototype = {
   highClassName: 'high',
   highClassNum: 4,
   delim: ' ',
-  escape: true,
   pagePrevName: 'prev',
   pageNextName: 'next',
   useHotkey: true,
-  urlTarget: '_blank',
-  editTarget: '_blank',
-
-  startElementText: '<table><tr><th></th><th width="60%">Description</th><th width="20%">Tags</th><th width="20%">Time</th><th></th>',
 
   setOptions: function(options) {
 
@@ -420,21 +418,32 @@ IncSearch.prototype = {
   },
 
   createViewArea: function(patternList) {
-    var elementText = [];
 
-    patternList = this.getHighlightPatterns(patternList);
+    var _ = this.elementBuilder;
+    var view = _(this.viewArea);
+    var table = _.table();
 
-    for (var i = 0, len = this.results.length; i < len; i++) {
-      elementText.push(this.createLineElement(this.results[i], patternList));
-    }
+    view.clear().append(table);
 
-    if (elementText.length > 0) {
-      if (this.startElementText) elementText.unshift(this.startElementText);
-      if (this.endElementText) elementText.push(this.endElementText);
+    if (this.results.length > 0) {
 
-      // "elementText" is safed HTML text.
-      // (escaped in "_escapeHTML" method)
-      this.viewArea.innerHTML = elementText.join('');
+      table
+        .append(_.tr()
+          .append(_.th())
+          .append(_.th({width: '60%'})
+            .append('Description'))
+          .append(_.th({width: '20%'})
+            .append('Tags'))
+          .append(_.th({width: '20%'})
+            .append('Time'))
+          .append(_.th()));
+
+      patternList = this.getHighlightPatterns(patternList);
+
+      for (var i = 0, len = this.results.length; i < len; i++) {
+        table.append(
+          this.createLineElement(this.results[i], patternList));
+      }
     }
 
     if (this.afterHookCreateView) {
@@ -467,40 +476,27 @@ IncSearch.prototype = {
 
   createLineElement: function(bookmark, patternList) {
 
-    var text = ['<tr><td></td><td>'];
+    var _ = this.elementBuilder;
 
-    // url, title
-    text.push(this.createTitleElement(bookmark, patternList));
+    return _.tr()
+      .append(_.td())
+      // url, title, info
+      .append(this.createTitleElement(bookmark, patternList))
+      // tags
+      .append(this.createHighlightElement('td', this.tagsString(bookmark.tags), patternList))
+      // time
+      .append(this.createHighlightElement('td', bookmark.time, patternList, false))
+      // edit
+      .append(this.createEditElement(bookmark, patternList));
+  },
 
-    // info
-    if (bookmark.info) {
-      text.push(this.createElement(bookmark.info, patternList, 'p'));
+  createHighlightElement: function(targetElement, value, patternList, highlight) {
+
+    var _ = this.elementBuilder;
+
+    if (typeof targetElement == 'string') {
+      targetElement = _(targetElement);
     }
-    text.push('</td>');
-
-    // tags
-    text.push(this.createElement(this.tagsString(bookmark.tags), patternList, 'td'));
-
-    // time
-    text.push(this.createElement(bookmark.time, patternList, 'td', false));
-
-    // edit
-    text.push(this.createEditElement(bookmark, patternList));
-    text.push('</tr>');
-
-    return text.join('');
-  },
-
-  createElement: function(value, patternList, tagName, highlight) {
-
-    return ['<', tagName, '>',
-            this.createText(value, patternList, highlight),
-            '</', tagName, '>'].join('');
-  },
-
-  createText: function(value, patternList, highlight) {
-
-    var textList = [];
 
     if (highlight == null) highlight = this.highlight;
 
@@ -509,22 +505,19 @@ IncSearch.prototype = {
       var first = this.getFirstMatch(value, patternList);
 
       while (first.listIndex != -1) {
-        textList.push(this._escapeHTML(value.substr(0, first.matchIndex)));
-        textList.push('<strong class="');
-        textList.push(this.highClassName);
-        textList.push((first.listIndex % this.highClassNum) + 1);
-        textList.push('">');
-        textList.push(this._escapeHTML(value.substr(first.matchIndex, patternList[first.listIndex].length)));
-        textList.push('</strong>');
+        targetElement
+          .append(value.substr(0, first.matchIndex))
+          .append(_.strong({className: this.highClassName + ((first.listIndex % this.highClassNum) + 1)})
+            .append(value.substr(first.matchIndex, patternList[first.listIndex].length)));
 
         value = value.substr(first.matchIndex + patternList[first.listIndex].length);
         first = this.getFirstMatch(value, patternList);
       }
     }
 
-    textList.push(this._escapeHTML(value));
+    targetElement.append(value);
 
-    return textList.join('');
+    return targetElement;
   },
 
   tagsString: function(tags, sep) {
@@ -540,32 +533,33 @@ IncSearch.prototype = {
   },
 
   createTitleElement: function(bookmark, patternList) {
-    var text = ['<a href="',  bookmark.url, '"'];
-    if (this.urlTarget) {
-      text.push(' target="', this.urlTarget, '" ');
-    }
-    text.push('>');
-    text.push(this.createText(bookmark.title, patternList));
-    text.push('</a>');
+
+    var _ = this.elementBuilder;
+    var td = _.td();
+
+    var a = _.a({href: bookmark.url, target: '_blank'});
+    this.createHighlightElement(a ,bookmark.title, patternList)
+    td.append(a);
 
     if (this.addTitleText) {
-      text.push(this.addTitleText(bookmark, patternList));
+      td.append(this.addTitleText(bookmark, patternList));
     }
 
-    text.push('<br />');
-    return text.join('');
+    td
+      .append(_.br())
+      .append(
+        this.createHighlightElement('p', bookmark.info, patternList));
+
+    return td;
   },
 
   createEditElement: function(bookmark, patternList) {
 
-    var text = ['<td><a href="',  this.createEditUrl(bookmark), '"'];
-    if (this.editTarget) {
-      text.push(' target="', this.editTarget, '" ');
-    }
+    var _ = this.elementBuilder;
 
-    text.push('>edit</a></td>');
-
-    return text.join('');
+    return _.td()
+      .append(_.a({href: this.createEditUrl(bookmark), target: '_blank'})
+        .append('edit'))
   },
 
   matchIndex: function(value, pattern) {
@@ -622,13 +616,5 @@ IncSearch.prototype = {
     var self = this;
     var args = Array.prototype.slice.call(arguments, 1);
     return function(event){ event = event || window.event; func.apply(self, [event].concat(args)); };
-  },
-  _escapeHTML: function(value) {
-    if (this.escape) {
-      return value.replace(/\&/g, '&amp;').replace( /</g, '&lt;').replace(/>/g, '&gt;')
-                .replace(/\"/g, '&quot;').replace(/\'/g, '&#39;').replace(/\n|\r\n/g, '<br />');
-    } else {
-      return value;
-    }
   }
 }
