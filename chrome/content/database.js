@@ -28,7 +28,7 @@ Database.bindParams = function(statement, params) {
   // Hash
   if (typeof(params) == 'object' && params.length == null) {
     var paramNames = this.getParamNames(statement);
-    for each(var name in paramNames) {
+    for (var name of paramNames) {
       var param = params[name];
       if (typeof(param)=='undefined') continue;
 
@@ -70,7 +70,7 @@ Database.getColumnNames = function(statement) {
 
 Database.getRow = function(row, columnNames){
   var result = {};
-  for each(var name in columnNames) {
+  for (var name of columnNames) {
     result[name] = row[name];
   }
   return result;
