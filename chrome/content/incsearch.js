@@ -39,9 +39,6 @@ IncSearch.prototype = {
     this.checkLoopTimer = null;
     this.setOptions(arguments[2] || {});
 
-    this.elementBuilder =
-      Ebi.createBuilder(['table', 'tr', 'th', 'td', 'p', 'a', 'strong', 'br']);
-
     this.reset();
 
     // check loop start
@@ -173,7 +170,6 @@ IncSearch.prototype = {
     } else if (bottomPos > document.documentElement.clientHeight + document.documentElement.scrollTop) {
       window.scrollTo(0, bottomPos - document.documentElement.clientHeight);
     }
-
     this.nowRow = rowNo;
   },
   openUrl: function(rowNo) {
@@ -421,24 +417,27 @@ IncSearch.prototype = {
 
   createViewArea: function(patternList) {
 
-    var _ = this.elementBuilder;
-    var view = _(this.viewArea);
-    var table = _.table();
-
-    view.clear().append(table);
+    var table = Ebi.createElement('table');
 
     if (this.results.length > 0) {
 
       table
-        .append(_.tr()
-          .append(_.th())
-          .append(_.th({width: '60%'})
-            .append('Description'))
-          .append(_.th({width: '20%'})
-            .append('Tags'))
-          .append(_.th({width: '20%'})
-            .append('Time'))
-          .append(_.th()));
+        .start('tr')
+          .start('th').end()
+          .start('th')
+            .property({width: '60%'})
+            .append('Description')
+          .end()
+          .start('th')
+            .property({width: '20%'})
+            .append('Tags')
+          .end()
+          .start('th')
+            .property({width: '20%'})
+            .append('Time')
+          .end()
+          .start('th').end()
+        .end();
 
       patternList = this.getHighlightPatterns(patternList);
 
@@ -447,6 +446,10 @@ IncSearch.prototype = {
           this.createLineElement(this.results[i], patternList));
       }
     }
+
+    Ebi.createElement(this.viewArea)
+      .clear()
+      .append(table);
 
     if (this.afterHookCreateView) {
       this.afterHookCreateView(patternList);
@@ -478,10 +481,8 @@ IncSearch.prototype = {
 
   createLineElement: function(bookmark, patternList) {
 
-    var _ = this.elementBuilder;
-
-    return _.tr()
-      .append(_.td())
+    return Ebi.createElement('tr')
+      .start('td').end()
       // url, title, info
       .append(this.createTitleElement(bookmark, patternList))
       // tags
@@ -494,10 +495,8 @@ IncSearch.prototype = {
 
   createHighlightElement: function(targetElement, value, patternList, highlight) {
 
-    var _ = this.elementBuilder;
-
     if (typeof targetElement == 'string') {
-      targetElement = _(targetElement);
+      targetElement = Ebi.createElement(targetElement);
     }
 
     if (highlight == null) highlight = this.highlight;
@@ -509,8 +508,10 @@ IncSearch.prototype = {
       while (first.listIndex != -1) {
         targetElement
           .append(value.substr(0, first.matchIndex))
-          .append(_.strong({className: this.highClassName + ((first.listIndex % this.highClassNum) + 1)})
-            .append(value.substr(first.matchIndex, patternList[first.listIndex].length)));
+          .start('strong')
+            .property({className: this.highClassName + ((first.listIndex % this.highClassNum) + 1)})
+            .append(value.substr(first.matchIndex, patternList[first.listIndex].length))
+          .end();
 
         value = value.substr(first.matchIndex + patternList[first.listIndex].length);
         first = this.getFirstMatch(value, patternList);
@@ -536,11 +537,12 @@ IncSearch.prototype = {
 
   createTitleElement: function(bookmark, patternList) {
 
-    var _ = this.elementBuilder;
-    var td = _.td();
+    var a = Ebi.createElement('a')
+              .property({href: bookmark.url, target: '_blank'});
 
-    var a = _.a({href: bookmark.url, target: '_blank'});
     this.createHighlightElement(a ,bookmark.title, patternList)
+
+    var td = Ebi.createElement('td')
     td.append(a);
 
     if (this.addTitleText) {
@@ -548,7 +550,7 @@ IncSearch.prototype = {
     }
 
     td
-      .append(_.br())
+      .start('br').end()
       .append(
         this.createHighlightElement('p', bookmark.info, patternList));
 
@@ -557,11 +559,11 @@ IncSearch.prototype = {
 
   createEditElement: function(bookmark, patternList) {
 
-    var _ = this.elementBuilder;
-
-    return _.td()
-      .append(_.a({href: this.createEditUrl(bookmark), target: '_blank'})
-        .append('edit'))
+    return Ebi.createElement('td')
+      .start('a')
+        .property({href: this.createEditUrl(bookmark), target: '_blank'})
+        .append('edit')
+      .end();
   },
 
   matchIndex: function(value, pattern) {
