@@ -90,11 +90,13 @@ IncSearch.prototype = {
         this.startSearch(input);
       } else {
         if (this.startSearchTimer) clearTimeout(this.startSearchTimer);
-        this.startSearchTimer = setTimeout(this._bind(this.startSearch, input), this.delay);
+        var startSearchFunction = this._bind(this.startSearch, input);
+        this.startSearchTimer = setTimeout(function() { startSearchFunction(); }, this.delay);
       }
     }
     if (this.checkLoopTimer) clearTimeout(this.checkLoopTimer);
-    this.checkLoopTimer = setTimeout(this._bind(this.checkLoop), this.interval);
+    var checkLoopFunction = this._bind(this.checkLoop);
+    this.checkLoopTimer = setTimeout(function() { checkLoopFunction(); }, this.interval);
   },
 
   isChange: function(input) {
@@ -220,7 +222,7 @@ IncSearch.prototype = {
     var sql = [
        this.searchSql, where.where,
        ' ORDER BY id',
-       ' LIMIT ', this.dispMax, 
+       ' LIMIT ', this.dispMax,
        ' OFFSET ', (start - 1)].join('');
 
     try {
