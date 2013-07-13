@@ -43,8 +43,27 @@ function initializeWindow(aWindow) {
   paletteElem.appendChild(toolbarbutton);
 }
 
-function openIncSearch(window) {
-  window.alert(1);
+function openIncSearch(aWindow) {
+  var gBrowser = aWindow.gBrowser;
+
+  var openUrl = 'chrome://googlebookmarks_incsearch/content/view.html';
+  var target = null;
+
+  var tabs = gBrowser.tabContainer.childNodes;
+
+  for (var i = 0, len = tabs.length; i < len; i++) {
+    if (tabs[i].linkedBrowser.currentURI.spec == openUrl) {
+      target = tabs[i];
+      break;
+    }
+  }
+
+  if (!target) {
+    gBrowser.selectedTab = gBrowser.addTab(openUrl);
+  } else {
+    gBrowser.selectedTab = target;
+    target.linkedBrowser.contentDocument.getElementById('text').focus();
+  }
 }
 
 
