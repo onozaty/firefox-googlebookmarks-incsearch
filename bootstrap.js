@@ -1,70 +1,85 @@
-// https://developer.mozilla.org/ja/docs/Extensions/Mobile/Addons_developer_guide
 const Cc = Components.classes;
 const Ci = Components.interfaces;
+var WindowWatcher  = Cc["@mozilla.org/embedcomp/window-watcher;1"].getService(Ci.nsIWindowWatcher);
+var WindowMediator = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+var PromptService  = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
 
-function loadIntoWindow(window) {
-  if (!window)
-    return;
+var windowObserver = {
+  observe: function (aSubject, aTopic, aData) {
 
-  if (window.location.href !== "chrome://browser/content/browser.xul") {
-    return;
+    var win = aSubject.QueryInterface(Components.interfaces.nsIDOMWindow);
+
+    if (aTopic === "domwindowopened") {
+
+      win.addEventListener("DOMContentLoaded", function() {
+        win.removeEventListener("DOMContentLoaded", arguments.callee, false);
+
+        if (win.location.href == "chrome://browser/content/browser.xul") {
+          initializeWindow(win);
+        }
+      }, false);
+    }
   }
+};
 
+function initializeWindow(aWindow) {
+
+  var paletteElem = aWindow.document.getElementById("BrowserToolbarPalette")
+                    || aWindow.document.getElementById("navigator-toolbox").palette;
+
+  // Create toolbar item
+  var NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+  var toolbarbutton = aWindow.document.createElementNS(NS, "toolbarbutton");
+
+  toolbarbutton.setAttribute("id", "googleBookmarksIncsearchButton");
+  toolbarbutton.setAttribute("label", "Google Bookmarks IncSearch");
+  toolbarbutton.setAttribute("tooltiptext", "Google Bookmarks IncSearch");
+  toolbarbutton.setAttribute("image", "chrome://googlebookmarks_incsearch/skin/icon-small.png");
+
+  toolbarbutton.addEventListener('command', function() {
+    openIncSearch(aWindow);
+  }, false);
+
+  paletteElem.appendChild(toolbarbutton);
+}
+
+function openIncSearch(window) {
   window.alert(1);
 }
 
-function unloadFromWindow(window) {
-  if (!window)
-    return;
-  // CLEAN UP HERE (remove the UI)
-}
 
-var windowListener = {
-  onOpenWindow: function(aWindow) {
-    // Wait for the window to finish loading
-    let domWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface(Ci.nsIDOMWindowInternal || Ci.nsIDOMWindow);
-    domWindow.addEventListener("load", function() {
-      domWindow.removeEventListener("load", arguments.callee, false);
-      loadIntoWindow(domWindow);
-    }, false);
-  },
- 
-  onCloseWindow: function(aWindow) {},
-  onWindowTitleChange: function(aWindow, aTitle) {}
-};
+function finalizeWindow(aWindow) {
+
+  var toolbarbutton = aWindow.document.getElementById("googleBookmarksIncsearchButton")
+
+  //PromptService.alert(null, "toolbarbutton", toolbarbutton);
+
+  toolbarbutton.parentNode.removeChild(toolbarbutton);
+}
 
 
 function startup(aData, aReason) {
-  let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
 
-  // Load into any existing windows
-  let windows = wm.getEnumerator("navigator:browser");
-  while (windows.hasMoreElements()) {
-    let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
-    loadIntoWindow(domWindow);
+  var browserWindows = WindowMediator.getEnumerator("navigator:browser");
+  while (browserWindows.hasMoreElements()) {
+    let win = browserWindows.getNext().QueryInterface(Ci.nsIDOMWindow);
+    initializeWindow(win);
   }
 
-  // Load into any new windows
- wm.addListener(windowListener);
+  WindowWatcher.registerNotification(windowObserver);
 }
 
 function shutdown(aData, aReason) {
-  // When the application is shutting down we normally don't have to clean
-  // up any UI changes made
-  if (aReason == APP_SHUTDOWN)
-    return;
 
-  let wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
-
-  // Stop listening for new windows
-  wm.removeListener(windowListener);
-
-  // Unload from any existing windows
-  let windows = wm.getEnumerator("navigator:browser");
-  while (windows.hasMoreElements()) {
-    let domWindow = windows.getNext().QueryInterface(Ci.nsIDOMWindow);
-    unloadFromWindow(domWindow);
+  var browserWindows = WindowMediator.getEnumerator("navigator:browser");
+  while (browserWindows.hasMoreElements()) {
+    let win = browserWindows.getNext().QueryInterface(Ci.nsIDOMWindow);
+    finalizeWindow(win);
   }
+
+  WindowWatcher.unregisterNotification(windowObserver);
+  windowObserver = null;
+  WindowWatcher = null;
 }
 
 function install(aData, aReason) {}
