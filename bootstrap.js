@@ -3,7 +3,8 @@ const Ci = Components.interfaces;
 var WindowWatcher  = Cc["@mozilla.org/embedcomp/window-watcher;1"].getService(Ci.nsIWindowWatcher);
 var WindowMediator = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
 var PromptService  = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
-
+var PrefService  = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+  
 var windowObserver = {
   observe: function (aSubject, aTopic, aData) {
 
@@ -24,11 +25,12 @@ var windowObserver = {
 
 function initializeWindow(aWindow) {
 
+  var NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
+
+  // toolbar item
   var paletteElem = aWindow.document.getElementById("BrowserToolbarPalette")
                     || aWindow.document.getElementById("navigator-toolbox").palette;
 
-  // Create toolbar item
-  var NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
   var toolbarbutton = aWindow.document.createElementNS(NS, "toolbarbutton");
 
   toolbarbutton.setAttribute("id", "googleBookmarksIncsearchButton");
@@ -41,6 +43,42 @@ function initializeWindow(aWindow) {
   }, false);
 
   paletteElem.appendChild(toolbarbutton);
+
+  // shortcut key
+  var prefBranch = PrefService.getBranch('extensions.googlebookmarks_incsearch.');
+
+  var modifiers = "accel";
+  try {
+     modifiers = prefBranch.getCharPref('shortcut.open.modifiers');
+  } catch(e) {}
+
+  var key = ":"
+  try {
+    key = prefBranch.getCharPref('shortcut.open.key');
+  } catch(e) {}
+
+  var isDisabledShortcutKey = false;
+  try {
+    isDisabledShortcutKey = prefBranch.getBoolPref('shortcut.open.disabled');
+  } catch(e) {}
+
+  if (!isDisabledShortcutKey) {
+
+    var mainKeysetElem = aWindow.document.getElementById("mainKeyset");
+    var keyElem = aWindow.document.createElementNS(NS, "key");
+
+    keyElem.setAttribute("id", "key_open_googleBookmarksIncsearch");
+    keyElem.setAttribute("key", key);
+    keyElem.setAttribute("modifiers", modifiers);
+    keyElem.setAttribute("oncommand", "void(0);");
+
+    keyElem.addEventListener('command', function() {
+      openIncSearch(aWindow);
+    }, false);
+
+    mainKeysetElem.appendChild(keyElem);
+  }
+
 }
 
 function openIncSearch(aWindow) {
@@ -70,10 +108,15 @@ function openIncSearch(aWindow) {
 function finalizeWindow(aWindow) {
 
   var toolbarbutton = aWindow.document.getElementById("googleBookmarksIncsearchButton")
+  toolbarbutton.parentNode.removeChild(toolbarbutton);
 
   //PromptService.alert(null, "toolbarbutton", toolbarbutton);
 
-  toolbarbutton.parentNode.removeChild(toolbarbutton);
+  var keyItem = aWindow.document.getElementById("key_open_googleBookmarksIncsearch")
+  if (keyItem != null) { 
+    keyItem.parentNode.removeChild(keyItem);
+  }
+
 }
 
 
