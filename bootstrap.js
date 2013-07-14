@@ -1,10 +1,10 @@
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
-var WindowWatcher  = Cc["@mozilla.org/embedcomp/window-watcher;1"].getService(Ci.nsIWindowWatcher);
-var WindowMediator = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
-var PromptService  = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
-var PrefService  = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+var WindowWatcher     = Cc["@mozilla.org/embedcomp/window-watcher;1"].getService(Ci.nsIWindowWatcher);
+var WindowMediator    = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Ci.nsIWindowMediator);
+var PromptService     = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
+var PrefService       = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
 
 var windowObserver = {
   observe: function (aSubject, aTopic, aData) {
@@ -63,9 +63,10 @@ function initializeToolbar(aWindow) {
   var toolbarbutton = aWindow.document.createElement("toolbarbutton");
 
   toolbarbutton.setAttribute("id", TOOLBAR_BUTTON_ELEMENT_ID);
+  toolbarbutton.setAttribute("class", "toolbarbutton-1 chromeclass-toolbar-additional");
   toolbarbutton.setAttribute("label", "Google Bookmarks IncSearch");
   toolbarbutton.setAttribute("tooltiptext", "Google Bookmarks IncSearch");
-  toolbarbutton.setAttribute("image", "chrome://googlebookmarks_incsearch/skin/icon-small.png");
+  toolbarbutton.style.listStyleImage = 'url("chrome://googlebookmarks_incsearch/skin/icon-small.png")';
 
   toolbarbutton.addEventListener("command", function() {
     openIncSearch(aWindow);
