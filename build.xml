@@ -18,6 +18,7 @@
         <include name="defaults/**" />
         <include name="chrome/**" />
 
+        <include name="bootstrap.js" />
         <include name="chrome.manifest" />
         <include name="install.rdf" />
 
