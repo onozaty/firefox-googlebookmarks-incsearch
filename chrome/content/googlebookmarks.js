@@ -80,9 +80,14 @@ GoogleBookmarksLoader.prototype.__load = function() {
         var xml = request.responseXML;
 
         if (xml == null) {
-          // error
-          var errMsg = 'error : Can not load data. '
-                       + 'Please check ' + request.channel.URI.prePath;
+          var errMsg = 'Can not sync data.\n';
+
+          if (request.channel.URI.prePath.indexOf('accounts.google.com')) {
+            errMsg += 'Please log in to your Google Account.'
+          } else {
+            errMsg += request.channel.URI.prePath;
+          }
+
           self.error(errMsg);
         }
 

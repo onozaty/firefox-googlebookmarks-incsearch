@@ -41,6 +41,21 @@ function finalizeWindow(aWindow) {
   removeElement(aWindow, TOOLBAR_BUTTON_ELEMENT_ID);
   removeElement(aWindow, SHORTCUT_KEY_ELEMENT_ID);
   removeElement(aWindow, MENU_ITEM_ELEMENT_ID);
+
+  var gBrowser = aWindow.gBrowser;
+  var tabs = gBrowser.tabContainer.childNodes;
+
+  var addonTabs = [];
+
+  for (var i = 0, len = tabs.length; i < len; i++) {
+    if (tabs[i].linkedBrowser.currentURI.spec.indexOf('chrome://googlebookmarks_incsearch/') == 0) {
+      addonTabs.push(tabs[i]);
+    }
+  }
+
+  for (var i = 0, len = addonTabs.length; i < len; i++) {
+    gBrowser.removeTab(addonTabs[i]);
+  }
 }
 
 function removeElement(aWindow, id) {

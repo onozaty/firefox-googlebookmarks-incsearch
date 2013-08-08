@@ -87,7 +87,7 @@ Glayer.copyProperties(Glayer, {
       textElement = this.getElement(textElement);
     }
 
-    textElement.textContent = message;
+    this.setTextContent(textElement, message);
     return boxElement;
   },
 
@@ -147,7 +147,7 @@ Glayer.copyProperties(Glayer, {
       okElement = this.getElement(okElement);
     }
 
-    textElement.textContent = message;
+    this.setTextContent(textElement, message);
 
     okElement.value = boxOptions.okLabel || this.defaultAlert.okLabel;
     okElement.onclick = boxOptions.callback || this.getDefaultAlertOkFunc();
@@ -220,7 +220,7 @@ Glayer.copyProperties(Glayer, {
       cancelElement = this.getElement(cancelElement);
     }
 
-    textElement.textContent = message;
+    this.setTextContent(textElement, message);
 
     okElement.value = boxOptions.okLabel || this.defaultConfirm.okLabel;
     okElement.onclick = this.getConfirmResultFunc(resultCallback, true);
@@ -242,5 +242,17 @@ Glayer.copyProperties(Glayer, {
   },
   fadeOutConfirm: function(boxElement, grayElement, fadeOption) {
     return this.fadeOutBox(boxElement || this.defaultConfirm.boxId, grayElement, fadeOption);
+  },
+
+  setTextContent: function(targetElement, text) {
+
+    var textList = text.split('\n');
+
+    for (var i = 0, len = textList.length; i < len; i++) {
+      if (i != 0) {
+        targetElement.appendChild(document.createElement('br'));
+      }
+      targetElement.appendChild(document.createTextNode(textList[i]));
+    }
   }
 });

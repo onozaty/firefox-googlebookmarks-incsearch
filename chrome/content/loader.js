@@ -54,7 +54,7 @@ LoaderBase.prototype = {
           incsearch.input.focus();
         }
       },
-      {okLabel: 'Retry', cancelLabel: 'cancel'}
+      {okLabel: 'Retry', cancelLabel: 'Cancel'}
     );
     document.getElementById(Glayer.defaultConfirm.cancelId).focus();
 
