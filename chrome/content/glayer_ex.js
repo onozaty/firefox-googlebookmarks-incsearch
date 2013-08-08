@@ -246,6 +246,10 @@ Glayer.copyProperties(Glayer, {
 
   setTextContent: function(targetElement, text) {
 
+    while (targetElement.firstChild) {
+      targetElement.removeChild(targetElement.firstChild);
+    }
+
     var textList = text.split('\n');
 
     for (var i = 0, len = textList.length; i < len; i++) {
