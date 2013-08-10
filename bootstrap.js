@@ -40,6 +40,7 @@ function finalizeWindow(aWindow) {
 
   removeElement(aWindow, TOOLBAR_BUTTON_ELEMENT_ID);
   removeElement(aWindow, SHORTCUT_KEY_ELEMENT_ID);
+  removeElement(aWindow, SHORTCUT_KEYSET_ELEMENT_ID);
   removeElement(aWindow, MENU_ITEM_ELEMENT_ID);
 
   var gBrowser = aWindow.gBrowser;
@@ -106,7 +107,8 @@ function resetToolbar(aWindow) {
 }
 
 // shortcut key
-const SHORTCUT_KEY_ELEMENT_ID = "googleBookmarksIncsearchShortcutKey"
+const SHORTCUT_KEY_ELEMENT_ID = "googleBookmarksIncsearchShortcutKey";
+const SHORTCUT_KEYSET_ELEMENT_ID = "googleBookmarksIncsearchShortcutKeySet";
 
 function initializeShortcutKey(aWindow) {
 
@@ -141,7 +143,11 @@ function initializeShortcutKey(aWindow) {
       openIncSearch(aWindow);
     }, false);
 
-    mainKeyset.appendChild(keyElement);
+    var keysetElement = aWindow.document.createElement("keyset");
+    keysetElement.setAttribute("id", SHORTCUT_KEYSET_ELEMENT_ID);
+
+    keysetElement.appendChild(keyElement);
+    mainKeyset.appendChild(keysetElement);
   }
 }
 
