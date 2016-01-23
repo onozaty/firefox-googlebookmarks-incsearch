@@ -170,12 +170,6 @@ var Ebi = (function() {
         for (var i = 0, length = tags.length; i < length; i++) {
           elementClass.prototype[tags[i]] = createTagFunction(tags[i]);
         }
-
-        /* Firefox only
-        elementClass.__noSuchMethod__ = function(id, args) {
-          return start(id, args[0]);
-        }
-        */
       }
 
       var emptyElement = new elementClass();
